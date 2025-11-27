@@ -1,12 +1,11 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/require-await */
 
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { TokenService } from '../../token/token.service';
 
 @Injectable()
-export class  ApiTokenGuard implements CanActivate {
+export class ApiTokenGuard implements CanActivate {
   constructor(private readonly tokenService: TokenService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -17,13 +16,13 @@ export class  ApiTokenGuard implements CanActivate {
       throw new UnauthorizedException('API Key is required in api-key header');
     }
 
-    if (!this.tokenService.usable(tokenId)) {
+    const isUsable = await this.tokenService.usable(tokenId);
+    if (!isUsable) {
       throw new UnauthorizedException('Token inválido o sin peticiones restantes');
     }
 
-    this.tokenService.reduce(tokenId);
+    await this.tokenService.reduce(tokenId);
 
     return true;
   }
 }
-

@@ -14,4 +14,4 @@ import { Character } from './entities/character.entity';
   controllers: [CharacterController],
   providers: [CharacterService, ApiTokenGuard],
 })
-export class CharactersModule {}
+export class CharacterModule {}
