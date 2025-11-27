@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsString, IsNumber, IsInt } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNumber } from 'class-validator';
 
 export class CreateLocationDto {
   @IsString()
@@ -9,11 +8,9 @@ export class CreateLocationDto {
   @IsString()
   type: string;
 
-  @Type(() => Number)
   @IsNumber()
   cost: number;
 
-  @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   ownerId: number;
 }
