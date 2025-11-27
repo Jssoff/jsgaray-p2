@@ -29,13 +29,13 @@ export class CharacterService {
       relations: ['favPlaces'],
     });
     if (!character) {
-      throw new BadRequestException('El personaje no se encontró');
+      throw new BadRequestException('Character not found');
     }
     const location = await this.locationRepository.findOne({
       where: { id: locationId },
     });
     if (!location) {
-      throw new BadRequestException('La locación no se encontró');
+      throw new BadRequestException('Location not found');
     }
     if (!character.favPlaces) {
       character.favPlaces = [];
@@ -45,7 +45,7 @@ export class CharacterService {
     return character;
   }
 
-    async getTaxes(characterId: number) {
+  async getTaxes(characterId: number) {
   const character = await this.characterRepository.findOne({
     where: { id: characterId },
     relations: ['property'],
