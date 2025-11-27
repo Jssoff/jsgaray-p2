@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+/* eslint-disable prettier/prettier */
+import { Character } from 'src/character/entities/character.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToMany } from 'typeorm';
 
 @Entity('locations')
 export class Location {
@@ -9,9 +11,16 @@ export class Location {
   name: string;
 
   @Column()
-  country: string;
+  type: string;
 
   @Column()
-  city: string;
+  cost: number;
+
+  @OneToOne(() => Character, character => character.property)
+  owner: Character;
+
+  @ManyToMany(() => Character, character => character.favPlaces)
+  favCharacters: Character[];
+
 }
 
