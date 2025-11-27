@@ -17,9 +17,9 @@ export class Character {
   @Column()
   employee: boolean;
 
-  @OneToOne(() => Location, (location) => location.owner, { nullable: true })
+  @OneToOne(() => Location, (location) => location.owner)
   @JoinColumn()
-  property: Location | null;
+  property: Location;
 
   @ManyToMany(() => Location, location => location.favCharacters)
   @JoinTable()
