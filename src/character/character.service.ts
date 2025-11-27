@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Character } from '../character/entities/character.entity';
 import { Location } from 'src/location/entities/location.entity';
 import { CreateCharacterDto } from './dto/create-character.dto';
@@ -20,6 +20,47 @@ export class CharacterService {
     await this.characterRepository.save(character);
     return character;
   }
+
+  async addFavCharacter(characterId: number, locationId: number) {
+    const character = await this.characterRepository.findOne({
+      where: { id: characterId },
+      relations: ['favPlaces'],
+    });
+    if (!character) {
+      throw new BadRequestException('El personaje no se encontró');
+    }
+    const location = await this.locationRepository.findOne({
+      where: { id: locationId },
+    });
+    if (!location) {
+      throw new BadRequestException('La locación no se encontró');
+    }
+    if (!character.favPlaces) {
+      character.favPlaces = [];
+    }
+    character.favPlaces.push(location);
+    await this.characterRepository.save(character);
+    return character;
+  }
+
+    async getTaxes(characterId: number) {
+    const character = await this.characterRepository.findOne({
+      where: { id: characterId },
+      relations: ['property'],
+    });
+    if (!character) {
+      throw new BadRequestException('Character not found');
+    }
+    if (!character.property) {
+      return { taxDebt: 0 };
+    }
+    const isEmployee = character.employee;
+    if (isEmployee) {
+      return { taxDebt: character.property.cost * 0.08 };
+    }
+    return { taxDebt: character.property.cost * 0.03 };
+  }
+
 
 
 
