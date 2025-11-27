@@ -7,6 +7,7 @@ import { TokenModule } from '../token/token.module';
 import { ApiTokenGuard } from '../guards/api-token/api-token.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Character } from './entities/character.entity';
+import { Location } from '../location/entities/location.entity';
 
 
 @Module({
