@@ -10,9 +10,11 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class CharacterService {
   constructor(
-     private characterRepository: Repository<Character>,
+      @InjectRepository(Character)
+    private readonly characterRepository: Repository<Character>,
+
     @InjectRepository(Location)
-    private locationRepository: Repository<Location>,
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
     async create(createCharacterDto: CreateCharacterDto) {
@@ -44,24 +46,19 @@ export class CharacterService {
   }
 
     async getTaxes(characterId: number) {
-    const character = await this.characterRepository.findOne({
-      where: { id: characterId },
-      relations: ['property'],
-    });
-    if (!character) {
-      throw new BadRequestException('Character not found');
-    }
-    if (!character.property) {
-      return { taxDebt: 0 };
-    }
-    const isEmployee = character.employee;
-    if (isEmployee) {
-      return { taxDebt: character.property.cost * 0.08 };
-    }
-    return { taxDebt: character.property.cost * 0.03 };
+  const character = await this.characterRepository.findOne({
+    where: { id: characterId },
+    relations: ['property'],
+  });
+  if (!character) throw new BadRequestException('Character not found');
+
+  if (!character.property) {
+    return { taxDebt: 0 };
   }
 
-
-
+  const coef = character.employee ? 0.08 : 0.03;
+  const taxDebt = character.property.cost * (1 + coef);
+  return { taxDebt };
+}
 
 }

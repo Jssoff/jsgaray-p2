@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Location } from '../../location/entities/location.entity';
 
 @Entity('characters')
@@ -17,8 +17,7 @@ export class Character {
   @Column()
   employee: boolean;
 
-  @OneToOne(() => Location, (location) => location.owner)
-  @JoinColumn()
+  @OneToOne(() => Location, location => location.owner)
   property: Location;
 
   @ManyToMany(() => Location, location => location.favCharacters)
