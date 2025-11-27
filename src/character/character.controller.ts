@@ -7,7 +7,7 @@ import { CreateCharacterDto } from './dto/create-character.dto';
 
 @Controller('character')
 @UseGuards(ApiTokenGuard)
-export class CharactersController {
+export class CharacterController {
   constructor( private readonly cs: CharacterService,
   ) {}
 

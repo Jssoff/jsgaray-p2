@@ -2,15 +2,16 @@
 
 import { Module } from '@nestjs/common';
 import { CharacterService } from './character.service';
-import { CharactersController } from './character.controller';
+import { CharacterController } from './character.controller';
 import { TokenModule } from '../token/token.module';
 import { ApiTokenGuard } from '../guards/api-token/api-token.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Character } from './entities/character.entity';
 
 
 @Module({
-  imports: [TokenModule],
-  controllers: [CharactersController],
+  imports: [TypeOrmModule.forFeature([Character, Location]), TokenModule],
+  controllers: [CharacterController],
   providers: [CharacterService, ApiTokenGuard],
-  exports: [CharacterService],
 })
 export class CharactersModule {}

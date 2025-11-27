@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
 import { CharacterController } from './character.controller';
 import { CharacterService } from './character.service';
