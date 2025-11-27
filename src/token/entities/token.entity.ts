@@ -13,7 +13,7 @@ export class TokenEntity {
     token: string;
 
     @Column('bool', {
-        default: false
+        default: true
     })
     active: boolean;
 

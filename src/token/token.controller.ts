@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { CreateTokenDto } from './dto/create-token.dto';
 
@@ -13,15 +13,15 @@ export class TokenController {
     return this.tokenService.create(createTokenDto);
   }
 
-  @Get()
-  findOne(@Query('token') token: string) {
-    return this.tokenService.find(token);
+  @Get(':id')
+  usable(@Param('id') id: string) {
+    return this.tokenService.usable(id);
   }
 
-  @Patch(':id/reduceReqLeft')
+
+  @Patch('reduce/:id')
   reduceReqLeft(@Param('id') id: string) {
     return this.tokenService.reduce(id);
   }
 
-  
 }
