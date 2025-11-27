@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCharacterDto } from './dto/create-character.dto';
-import { UpdateCharacterDto } from './dto/update-character.dto';
+/* eslint-disable prettier/prettier */
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Character } from '../character/entities/character.entity';
+import { Location } from 'src/location/entities/location.entity';
 
 @Injectable()
 export class CharacterService {
-  create(createCharacterDto: CreateCharacterDto) {
-    return 'This action adds a new character';
+  private items: Character[] = [];
+  private seq = 1;
+
+  create(data: { name: string; salary: number; employee: boolean }) {
+    const c: Character = {
+      id: this.seq++,
+      name: data.name,
+      salary: data.salary,
+      employee: !!data.employee,
+      property: null,
+      favPlaces: [],
+    } as Character;
+    this.items.push(c);
+    return c;
   }
 
-  findAll() {
-    return `This action returns all character`;
+  findById(id: number) {
+    const c = this.items.find((x) => x.id === id);
+    if (!c) throw new NotFoundException('Personaje no encontrado');
+    return c;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} character`;
+  update(id: number, data: Partial<Character>) {
+    const c = this.findById(id);
+    Object.assign(c, data);
+    return c;
   }
 
-  update(id: number, updateCharacterDto: UpdateCharacterDto) {
-    return `This action updates a #${id} character`;
+  all() {
+    return this.items;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} character`;
+  addFavorite(characterId: number, location: Location) {
+    const c = this.findById(characterId);
+    if (!c.favPlaces) c.favPlaces = [];
+    const exists = c.favPlaces.some((p) => p.id === location.id);
+    if (!exists) c.favPlaces.push(location);
+    return c;
+  }
+
+  removeFavorite(characterId: number, locationId: number) {
+    const c = this.findById(characterId);
+    if (!c.favPlaces) return c;
+    c.favPlaces = c.favPlaces.filter((p) => p.id !== locationId);
+    return c;
   }
 }

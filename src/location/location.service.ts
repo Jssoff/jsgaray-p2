@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { CreateLocationDto } from './dto/create-location.dto';
-import { UpdateLocationDto } from './dto/update-location.dto';
+/* eslint-disable prettier/prettier */
+
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Location } from '../location/entities/location.entity';
+import { Character } from 'src/character/entities/character.entity';
 
 @Injectable()
 export class LocationService {
-  create(createLocationDto: CreateLocationDto) {
-    return 'This action adds a new location';
+  private places: Location[] = [];
+  private seq = 1;
+
+  create(datos: { name: string; type: string; cost: number; owner: Character }) {
+    const loc: Location = {
+      id: this.seq++,
+      name: datos.name,
+      type: datos.type,
+      cost: datos.cost,
+      owner: datos.owner,
+      favCharacters: [],
+    } as Location;
+    this.places.push(loc);
+    return loc;
   }
 
-  findAll() {
-    return `This action returns all location`;
+  findById(id: number) {
+    const l = this.places.find((x) => x.id === id);
+    if (!l) throw new NotFoundException('Locación no encontrada');
+    return l;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} location`;
+  findByOwnerId(ownerId: number): Location | null {
+    return this.places.find((x) => x.owner && x.owner.id === ownerId) ?? null;
   }
 
-  update(id: number, updateLocationDto: UpdateLocationDto) {
-    return `This action updates a #${id} location`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} location`;
+  all() {
+    return this.places;
   }
 }
