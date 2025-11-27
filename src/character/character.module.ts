@@ -1,9 +1,16 @@
+/* eslint-disable prettier/prettier */
+
 import { Module } from '@nestjs/common';
 import { CharacterService } from './character.service';
-import { CharacterController } from './character.controller';
+import { CharactersController } from './character.controller';
+import { TokenModule } from '../token/token.module';
+import { ApiTokenGuard } from '../guards/api-token/api-token.guard';
+
 
 @Module({
-  controllers: [CharacterController],
-  providers: [CharacterService],
+  imports: [TokenModule],
+  controllers: [CharactersController],
+  providers: [CharacterService, ApiTokenGuard],
+  exports: [CharacterService],
 })
-export class CharacterModule {}
+export class CharactersModule {}

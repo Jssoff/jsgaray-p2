@@ -35,7 +35,7 @@ export class LocationsController {
   }
 
   @Get()
-  allWithVisitors(@Req() req) {
+  all(@Req() req) {
     this.tokenService.reduce(req.tokenId);
     const locs = this.ls.all();
     const characters = this.cs.all();
