@@ -38,7 +38,10 @@ async create(createLocationDto: CreateLocationDto) {
     return location;
   }
 
-  async findAll() {
-    return await this.locationRepository.find();
-  }
+async findAll() {
+  return await this.locationRepository.find({
+    relations: ['favCharacters'], 
+  });
+}
+
 }
