@@ -1,26 +1,29 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/require-await */
 
-
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
+import { Request } from 'express';
 import { TokenService } from '../../token/token.service';
 
 @Injectable()
-export class ApiTokenGuard implements CanActivate {
+export class  ApiTokenGuard implements CanActivate {
   constructor(private readonly tokenService: TokenService) {}
 
-  canActivate(context: ExecutionContext) {
-    const req = context.switchToHttp().getRequest();
-    const tokenId = req.headers['x-token-id'] as string;
-    if (!tokenId) throw new UnauthorizedException('Token no proporcionado');
-    try {
-      const usable = this.tokenService.usable(tokenId);
-      if (!usable) throw new UnauthorizedException('Token inválido o sin peticiones');
-      req.tokenId = tokenId;
-      return true;
-    } catch (e) {
-      throw new UnauthorizedException(e.message || 'Token inválido');
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
+    const tokenId = request.headers['api-key'] as string | undefined;
+
+    if (!tokenId) {
+      throw new UnauthorizedException('API Key is required in api-key header');
     }
+
+    if (!this.tokenService.usable(tokenId)) {
+      throw new UnauthorizedException('Token inválido o sin peticiones restantes');
+    }
+
+    this.tokenService.reduce(tokenId);
+
+    return true;
   }
 }
+

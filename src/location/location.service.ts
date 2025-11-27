@@ -1,38 +1,44 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable} from '@nestjs/common';
 import { Location } from '../location/entities/location.entity';
 import { Character } from 'src/character/entities/character.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateLocationDto } from './dto/create-location.dto';
 
 @Injectable()
 export class LocationService {
-  private places: Location[] = [];
-  private seq = 1;
 
-  create(datos: { name: string; type: string; cost: number; owner: Character }) {
-    const loc: Location = {
-      id: this.seq++,
-      name: datos.name,
-      type: datos.type,
-      cost: datos.cost,
-      owner: datos.owner,
-      favCharacters: [],
-    } as Location;
-    this.places.push(loc);
-    return loc;
+    constructor(
+    @InjectRepository(Location)
+    private locationRepository: Repository<Location>,
+    @InjectRepository(Character)
+    private characterRepository: Repository<Character>,
+  ) {}
+
+async create(createLocationDto: CreateLocationDto) {
+    const owner = await this.characterRepository.findOne({
+      where: { id: createLocationDto.ownerId },
+      relations: ['property'],
+    });
+    if (!owner) {
+      throw new BadRequestException('Owner not found');
+    }
+    if (owner.property) {
+      throw new BadRequestException('Owner already has a property');
+    }
+    const location = this.locationRepository.create({
+      name: createLocationDto.name,
+      type: createLocationDto.type,
+      cost: createLocationDto.cost,
+      owner: owner,
+    });
+    await this.locationRepository.save(location);
+    return location;
   }
 
-  findById(id: number) {
-    const l = this.places.find((x) => x.id === id);
-    if (!l) throw new NotFoundException('Locación no encontrada');
-    return l;
-  }
-
-  findByOwnerId(ownerId: number): Location | null {
-    return this.places.find((x) => x.owner && x.owner.id === ownerId) ?? null;
-  }
-
-  all() {
-    return this.places;
+  async findAll() {
+    return await this.locationRepository.find();
   }
 }

@@ -1,15 +1,18 @@
 /* eslint-disable prettier/prettier */
-import { IsString, IsOptional, IsBoolean, IsNumber } from 'class-validator';
+import { IsString, IsBoolean, IsNumber, IsNotEmpty} from 'class-validator';
 
 export class CreateTokenDto {
 
   @IsString()
+  @IsNotEmpty()
   token: string;             
 
-  @IsOptional()
   @IsBoolean()
-  active?: boolean;         
-  @IsOptional()
+  @IsNotEmpty()
+  active?: boolean;   
+
+
   @IsNumber()
+  @IsNotEmpty()
   reqLeft?: number;        
 }

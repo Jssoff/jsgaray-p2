@@ -17,7 +17,7 @@ export class TokenEntity {
     })
     active: boolean;
 
-    @Column('text', {
+    @Column('int', {
         default: 10
     })
     reqLeft: number;
