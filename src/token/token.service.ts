@@ -1,36 +1,44 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { TokenEntity } from '../token/entities/token.entity';
-import { v4 as uuid } from 'uuid';
+import { CreateTokenDto } from './dto/create-token.dto';
 
 @Injectable()
 export class TokenService {
-  private tokens = new Map<string, TokenEntity>();
+  constructor(
+    @InjectRepository(TokenEntity)
+    private readonly tokenRepository: Repository<TokenEntity>,
+  ) {}
 
-  create(initialReqLeft = 10) {
-    const id = uuid();
-    const token: TokenEntity = { id, token:"1234dgb",active: true, reqLeft: initialReqLeft };
-    this.tokens.set(id, token);
+  async create(createApitokenDto: CreateTokenDto) {
+    const token = this.tokenRepository.create(createApitokenDto);
+    await this.tokenRepository.save(token);
+    return {
+      id: token.id,
+      token: token.token,
+      active: token.active,
+      reqLeft: token.reqLeft,
+    };
+  }
+
+  async find(id: string) {
+    const token = await this.tokenRepository.findOneBy({ id });
+    if (!token) throw new NotFoundException('Token no encontrado');
     return token;
   }
 
-  find(id: string) {
-    const t = this.tokens.get(id);
-    if (!t) throw new NotFoundException('Token no encontrado');
-    return t;
+  async usable(id: string) {
+    const token = await this.find(id);
+    return token.active && token.reqLeft > 0;
   }
 
-  usable(id: string) {
-    const t = this.find(id);
-    return t.active && t.reqLeft > 0;
+  async reduce(id: string) {
+    const token = await this.find(id);
+    if (!token.active) throw new BadRequestException('Token inactivo');
+    if (token.reqLeft <= 0) throw new BadRequestException('Token sin peticiones restantes');
+    token.reqLeft = Math.max(0, token.reqLeft - 1);
+    return await this.tokenRepository.save(token);
   }
-
-  reduce(id: string) {
-    const t = this.find(id);
-    if (!t.active) throw new NotFoundException('Token inactivo');
-    if (t.reqLeft <= 0) throw new NotFoundException('Token sin peticiones restantes');
-    t.reqLeft = Math.max(0, t.reqLeft - 1);
-    return t;
-  }
-
 }
