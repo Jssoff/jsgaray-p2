@@ -24,7 +24,6 @@ export class CharacterController {
     return this.cs.addFavCharacter(+id, +locationId);
   }
 
-
   @Get(':id/taxes')
   getTaxes(@Param('id') id: string) {
     return this.cs.getTaxes(+id);

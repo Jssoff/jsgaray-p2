@@ -9,7 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Character } from './entities/character.entity';
 import { Location } from '../location/entities/location.entity';
 
-
 @Module({
   imports: [TypeOrmModule.forFeature([Character, Location]), TokenModule],
   controllers: [CharacterController],
